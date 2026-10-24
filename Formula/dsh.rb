@@ -1,3 +1,5 @@
+require "json"
+
 class Dsh < Formula
   desc "Agent-harness CLI (no-telemetry fork)"
   homepage "https://github.com/nentor/deepseek-harness-no-telemetry"
@@ -18,14 +20,44 @@ class Dsh < Formula
     # file: URL, so the registry can never substitute upstream builds.
     # (pnpm deploy drops the vendored peer dependencies and re-resolves
     # workspace: specs against the registry.)
+    # The mapping is inlined (rather than calling the repo helper script) so
+    # generated formulas also build tag trees that predate the helper.
     system "pnpm", "run", "release:pack", "--family", "dsh", "--out", "dist/npm"
     system "pnpm", "run", "release:pack", "--family", "vendor", "--out", "dist/npm-vendor"
     system "pnpm", "--dir", "native/system", "run", "build:ts"
     system "pnpm", "--dir", "native/system/packages/entry", "pack",
                     "--pack-destination", "#{buildpath}/dist/npm-landlock"
-    system "node", "scripts/release/write-consumer-manifest.mjs",
-                    "--out", "#{libexec}/package.json",
-                    "--from", "dist/npm", "--from", "dist/npm-vendor", "--from", "dist/npm-landlock"
+    consumer = {
+      "name" => "dsh-brew-consumer",
+      "version" => "0.0.0",
+      "private" => true,
+      "dependencies" => {},
+      "optionalDependencies" => {},
+    }
+    os = RUBY_PLATFORM.include?("darwin") ? "darwin" : "linux"
+    arch = (RUBY_PLATFORM.include?("arm64") || RUBY_PLATFORM.include?("aarch64")) ? "arm64" : "x64"
+    accept = lambda do |value, current|
+      return true if value.nil?
+      unless value.is_a?(Array) && value.all? { |t| t.is_a?(String) }
+        raise "packed platform constraints must be arrays of strings"
+      end
+      accepted = value.all? { |t| t.start_with?("!") }
+      value.each do |tag|
+        return false if tag == "!#{current}"
+        accepted = true if tag == current || (tag == "any" && value.length == 1)
+      end
+      accepted
+    end
+    Dir["dist/npm/*.tgz", "dist/npm-vendor/*.tgz", "dist/npm-landlock/*.tgz"].sort.each do |tgz|
+      manifest = JSON.parse(Utils.safe_popen_read("tar", "-xzf", tgz, "-O", "package/package.json"))
+      name = manifest["name"]
+      raise "packed tarball manifest lacks name" unless name.is_a?(String)
+      compatible = accept.call(manifest["os"], os) && accept.call(manifest["cpu"], arch)
+      key = compatible ? "dependencies" : "optionalDependencies"
+      consumer[key][name] = "file://#{File.expand_path(tgz)}"
+    end
+    raise "no packed tarballs found" if consumer["dependencies"].empty?
+    (libexec/"package.json").write(JSON.generate(consumer))
     # Local consumer install, not a global pack install, so the global-style
     # std_npm_args helper does not apply here.
     system "npm", "install", "--prefix=#{libexec}", "--cache=#{buildpath}/.npm-cache",

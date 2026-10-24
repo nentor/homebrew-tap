@@ -21,12 +21,24 @@ class Dsh < Formula
     system "pnpm", "run", "release:pack", "--family", "dsh", "--out", "dist/npm"
     system "pnpm", "run", "release:pack", "--family", "vendor", "--out", "dist/npm-vendor"
     system "pnpm", "--dir", "native/system", "run", "build:ts"
-    system "pnpm", "--dir", "native/system/packages/entry", "pack", "--pack-destination", "#{buildpath}/dist/npm-landlock"
+    system "pnpm", "--dir", "native/system/packages/entry", "pack",
+                    "--pack-destination", "#{buildpath}/dist/npm-landlock"
     system "node", "scripts/release/write-consumer-manifest.mjs",
                     "--out", "#{libexec}/package.json",
                     "--from", "dist/npm", "--from", "dist/npm-vendor", "--from", "dist/npm-landlock"
+    # Local consumer install, not a global pack install, so the global-style
+    # std_npm_args helper does not apply here.
     system "npm", "install", "--prefix=#{libexec}", "--cache=#{buildpath}/.npm-cache",
                     "--no-audit", "--no-fund", "--package-lock=false", "--omit=optional"
+    # node-pty ships prebuilds for every platform; drop the ones that cannot
+    # load on this host (Homebrew rejects foreign-arch binaries in the prefix).
+    prebuilds = libexec/"node_modules/node-pty/prebuilds"
+    if prebuilds.directory?
+      keep = "#{OS.kernel_name}-#{Hardware::CPU.arch.to_s.sub("x86_64", "x64")}"
+      prebuilds.children.select(&:directory?).each do |dir|
+        rm_rf dir unless dir.basename.to_s == keep
+      end
+    end
     (bin/"dsh").write <<~EOS
       #!/bin/sh
       # Standalone dsh on plain node (Desktop ships its own Electron-based launcher).

@@ -13,10 +13,11 @@ class Dsh < Formula
     ENV["DSH_CLIENT_COMMIT_HASH"] = "785de4f"
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
-    system "pnpm", "--filter", "@deepseek-ai/dsh", "deploy", "--legacy", "--prod",
-            "--config.allow-unused-patches=true", "--config.node-linker=hoisted",
-            "--config.auto-install-peers=false", "--config.link-workspace-packages=true",
-            "--config.hoist-workspace-packages=false", libexec
+    # Default deploy (isolated linker, auto-installed peers): the dsh closure
+    # carries the vendored framework as peer dependencies, which the exe-style
+    # legacy/hoisted flags drop from the staged tree.
+    system "pnpm", "--filter", "@deepseek-ai/dsh", "deploy", "--prod",
+                    "--config.allow-unused-patches=true", libexec
     (bin/"dsh").write <<~EOS
       #!/bin/sh
       # Standalone dsh on plain node (Desktop ships its own Electron-based launcher).

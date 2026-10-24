@@ -8,11 +8,10 @@ class Dsh < Formula
   sha256 "385767d3dc44089596b904dea29aff1494eae70761e1aae46e85d40f90844691"
   license "MIT"
   depends_on "cmake" => :build
-  depends_on "node@24"
   depends_on "pnpm" => :build
-  # koffi falls back to a source build when no prebuilt is available;
-  # CI runners provide cmake for the same reason.
-  depends_on "cmake" => :build
+  depends_on "node@24"
+  # cmake is a safety net: koffi falls back to a source build when no prebuilt
+  # is available (CI runners provide cmake for the same reason).
 
   def install
     # Tag tarballs carry no .git metadata; the build accepts the commit explicitly.

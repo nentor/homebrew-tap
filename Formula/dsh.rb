@@ -9,8 +9,8 @@ class Dsh < Formula
   license "MIT"
   depends_on "pnpm" => :build
   depends_on "node@24"
-  # koffi (pinned 3.1.1 by consumers) rebuilds from source when its prebuilt
-  # optional package is omitted; CI runners provide cmake for the same reason.
+  # koffi falls back to a source build when no prebuilt is available;
+  # CI runners provide cmake for the same reason.
   depends_on "cmake" => :build
 
   def install

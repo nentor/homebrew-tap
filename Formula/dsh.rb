@@ -3,7 +3,7 @@ class Dsh < Formula
   homepage "https://github.com/nentor/deepseek-harness-no-telemetry"
   url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/desktop-2026-10-24.tar.gz"
   version "0.2.1-rc.3-20261024"
-  sha256 "b8b14c68d2abb819052bf40454a655e25adafbef8c27b1e285fa0c219399f95b"
+  sha256 "385767d3dc44089596b904dea29aff1494eae70761e1aae46e85d40f90844691"
   license "MIT"
   depends_on "pnpm" => :build
   depends_on "node@24"

@@ -3,9 +3,9 @@ require "json"
 class Dsh < Formula
   desc "Agent-harness CLI (no-telemetry fork)"
   homepage "https://github.com/nentor/deepseek-harness-no-telemetry"
-  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/desktop-2026-10-24.tar.gz"
-  version "0.2.1-rc.3-20261024"
-  sha256 "385767d3dc44089596b904dea29aff1494eae70761e1aae46e85d40f90844691"
+  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/dsh-v0.2.1-rc.3-no-telemetry.tar.gz"
+  version "0.2.1-rc.3-no-telemetry"
+  sha256 "07fbab4b0840df127dc67c774c4f3ab5d2933aa1e6305c9186628eca421226ba"
   license "MIT"
   depends_on "cmake" => :build
   depends_on "pnpm" => :build
@@ -15,7 +15,7 @@ class Dsh < Formula
 
   def install
     # Tag tarballs carry no .git metadata; the build accepts the commit explicitly.
-    ENV["DSH_CLIENT_COMMIT_HASH"] = "785de4f"
+    ENV["DSH_CLIENT_COMMIT_HASH"] = "93d31b7"
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
     # Pack the workspace and install from local tarballs exactly like CI

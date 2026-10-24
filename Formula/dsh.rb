@@ -71,14 +71,15 @@ class Dsh < Formula
     # per-arch directories; Homebrew rejects non-native binaries in the
     # prefix). The loader selects by platform and arch, so a foreign-arch
     # directory can never be used on this host.
-    foreign = if OS.mac?
-                [Hardware::CPU.arm? ? "darwin-x64" : "darwin-arm64"]
-              else
-                %w[darwin-x64 darwin-arm64]
-              end
+    foreign =
+      if OS.mac?
+        [Hardware::CPU.arm? ? "darwin-x64" : "darwin-arm64"]
+      else
+        %w[darwin-x64 darwin-arm64]
+      end
     foreign.each do |dir_name|
       Dir.glob(libexec/"node_modules/**/#{dir_name}").each do |path|
-        rm_rf path if File.directory?(path)
+        rm_r path if File.directory?(path)
       end
     end
     (bin/"dsh").write <<~EOS

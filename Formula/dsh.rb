@@ -36,7 +36,7 @@ class Dsh < Formula
     if prebuilds.directory?
       keep = "#{OS.kernel_name}-#{Hardware::CPU.arch.to_s.sub("x86_64", "x64")}"
       prebuilds.children.select(&:directory?).each do |dir|
-        rm_rf dir unless dir.basename.to_s == keep
+        rm_rf dir if dir.basename.to_s != keep
       end
     end
     (bin/"dsh").write <<~EOS

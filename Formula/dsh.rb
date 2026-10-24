@@ -10,7 +10,8 @@ class Dsh < Formula
 
   def install
     system "pnpm", "install", "--frozen-lockfile"
-    system "pnpm", "run", "build:official"
+    # Tag tarballs carry no .git metadata; the build accepts the commit explicitly.
+    system "env", "DSH_CLIENT_COMMIT_HASH=785de4f", "pnpm", "run", "build:official"
     system "pnpm", "--filter", "@deepseek-ai/dsh", "deploy", "--legacy", "--prod",
             "--config.allow-unused-patches=true", "--config.node-linker=hoisted",
             "--config.auto-install-peers=false", "--config.link-workspace-packages=true",

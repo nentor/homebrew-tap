@@ -13,7 +13,7 @@ class Dsh < Formula
     ENV["DSH_CLIENT_COMMIT_HASH"] = "785de4f"
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
-    # Pack the workspace and install from local tarballs exactly like CI's
+    # Pack the workspace and install from local tarballs exactly like CI
     # packed-install verification: every workspace dependency resolves from a
     # file: URL, so the registry can never substitute upstream builds.
     # (pnpm deploy drops the vendored peer dependencies and re-resolves

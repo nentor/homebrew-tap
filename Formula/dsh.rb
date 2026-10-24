@@ -63,8 +63,8 @@ class Dsh < Formula
     (libexec/"package.json").write(JSON.generate(consumer))
     # Local consumer install, not a global pack install, so the global-style
     # std_npm_args helper does not apply here. Optionals stay enabled: npm
-    # skips foreign-platform ones by os/cpu, while the current platform's
-    # prebuilt optionals (e.g. koffi) must install.
+    # skips foreign-platform ones by os/cpu, while the current platform prebuilt
+    # optionals (e.g. koffi) must install.
     system "npm", "install", "--prefix=#{libexec}", "--cache=#{buildpath}/.npm-cache",
                     "--no-audit", "--no-fund", "--package-lock=false"
     # node-pty ships prebuilds for every platform; drop the ones that cannot

@@ -17,10 +17,12 @@ binary and Homebrew will refuse to link the second one.
 
 ## Releases
 
-Both artifacts track the rolling `desktop-YYYY-MM-DD` prereleases and are
-refreshed by `fork-desktop-release.yml` on every fork build:
+Both artifacts track **stable** `dsh-v<VERSION>-no-telemetry` releases, cut by
+`fork-versioned-release.yml` (package versions stay identical to upstream; the
+`-no-telemetry` marker lives on the tag and release only). The rolling
+`desktop-YYYY-MM-DD` prereleases stay off the tap.
 
-- `Casks/deepseek-harness.rb` — unsigned macOS DMG plus a `binary` shim that
+- `Casks/deepseek-harness.rb` — Desktop installers plus a `binary` shim that
   exposes the Desktop-bundled CLI (`Contents/Resources/runtime/cli/bin/dsh`,
   runs under the app's Electron runtime) as `dsh`.
 - `Formula/dsh.rb` — builds the CLI from source (`pnpm install` +

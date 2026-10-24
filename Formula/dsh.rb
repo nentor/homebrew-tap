@@ -59,13 +59,11 @@ class Dsh < Formula
       name = manifest["name"]
       raise "packed tarball manifest lacks name" unless name.is_a?(String)
 
-
       compatible = accept.call(manifest["os"], os) && accept.call(manifest["cpu"], arch)
       key = compatible ? "dependencies" : "optionalDependencies"
       consumer[key][name] = "file://#{File.expand_path(tgz)}"
     end
     raise "no packed tarballs found" if consumer["dependencies"].empty?
-
 
     (libexec/"package.json").write(JSON.generate(consumer))
     # Local consumer install, not a global pack install, so the global-style

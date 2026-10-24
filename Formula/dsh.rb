@@ -12,9 +12,9 @@ class Dsh < Formula
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
     system "pnpm", "--filter", "@deepseek-ai/dsh", "deploy", "--legacy", "--prod",
-                    "--config.allow-unused-patches=true", "--config.node-linker=hoisted",
-                    "--config.auto-install-peers=false", "--config.link-workspace-packages=true",
-                    "--config.hoist-workspace-packages=false", libexec
+            "--config.allow-unused-patches=true", "--config.node-linker=hoisted",
+            "--config.auto-install-peers=false", "--config.link-workspace-packages=true",
+            "--config.hoist-workspace-packages=false", libexec
     (bin/"dsh").write <<~EOS
       #!/bin/sh
       # Standalone dsh on plain node (Desktop ships its own Electron-based launcher).

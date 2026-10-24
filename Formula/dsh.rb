@@ -62,9 +62,11 @@ class Dsh < Formula
     raise "no packed tarballs found" if consumer["dependencies"].empty?
     (libexec/"package.json").write(JSON.generate(consumer))
     # Local consumer install, not a global pack install, so the global-style
-    # std_npm_args helper does not apply here.
+    # std_npm_args helper does not apply here. Optionals stay enabled: npm
+    # skips foreign-platform ones by os/cpu, while the current platform's
+    # prebuilt optionals (e.g. koffi) must install.
     system "npm", "install", "--prefix=#{libexec}", "--cache=#{buildpath}/.npm-cache",
-                    "--no-audit", "--no-fund", "--package-lock=false", "--omit=optional"
+                    "--no-audit", "--no-fund", "--package-lock=false"
     # node-pty ships prebuilds for every platform; drop the ones that cannot
     # load on this host (Homebrew rejects foreign-arch binaries in the prefix).
     prebuilds = libexec/"node_modules/node-pty/prebuilds"

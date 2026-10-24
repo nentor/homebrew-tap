@@ -13,15 +13,24 @@ class Dsh < Formula
     ENV["DSH_CLIENT_COMMIT_HASH"] = "785de4f"
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
-    # Default deploy (isolated linker, auto-installed peers): the dsh closure
-    # carries the vendored framework as peer dependencies, which the exe-style
-    # legacy/hoisted flags drop from the staged tree.
-    system "pnpm", "--filter", "@deepseek-ai/dsh", "deploy", "--prod",
-                    "--config.allow-unused-patches=true", libexec
+    # Pack the workspace and install from local tarballs exactly like CI's
+    # packed-install verification: every workspace dependency resolves from a
+    # file: URL, so the registry can never substitute upstream builds.
+    # (pnpm deploy drops the vendored peer dependencies and re-resolves
+    # workspace: specs against the registry.)
+    system "pnpm", "run", "release:pack", "--family", "dsh", "--out", "dist/npm"
+    system "pnpm", "run", "release:pack", "--family", "vendor", "--out", "dist/npm-vendor"
+    system "pnpm", "--dir", "native/system", "run", "build:ts"
+    system "pnpm", "--dir", "native/system/packages/entry", "pack", "--pack-destination", "#{buildpath}/dist/npm-landlock"
+    system "node", "scripts/release/write-consumer-manifest.mjs",
+                    "--out", "#{libexec}/package.json",
+                    "--from", "dist/npm", "--from", "dist/npm-vendor", "--from", "dist/npm-landlock"
+    system "npm", "install", "--prefix=#{libexec}", "--cache=#{buildpath}/.npm-cache",
+                    "--no-audit", "--no-fund", "--package-lock=false", "--omit=optional"
     (bin/"dsh").write <<~EOS
       #!/bin/sh
       # Standalone dsh on plain node (Desktop ships its own Electron-based launcher).
-      exec "#{formula_opt_bin("node@24")}/node" "#{libexec}/lib/bin.js" "$@"
+      exec "#{formula_opt_bin("node@24")}/node" "#{libexec}/node_modules/@deepseek-ai/dsh/lib/bin.js" "$@"
     EOS
     chmod 0755, bin/"dsh"
   end

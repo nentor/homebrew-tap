@@ -3,9 +3,9 @@ require "json"
 class Dsh < Formula
   desc "Agent-harness CLI (no-telemetry fork)"
   homepage "https://github.com/nentor/deepseek-harness-no-telemetry"
-  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/dsh-v0.2.2-alpha.2-no-telemetry.tar.gz"
+  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/dsh-v0.2.2-alpha.2.tar.gz"
   version "0.2.2-alpha.2-no-telemetry"
-  sha256 "72d21bd87a609a2d50d4f398d8b0119a03045121d98766a66733755893d286cb"
+  sha256 "9acd746198e5986e80a09feb34b19d65b90b5cadad74e337753ae8fce9c284d3"
   license "MIT"
   depends_on "cmake" => :build
   depends_on "pnpm" => :build

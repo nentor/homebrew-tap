@@ -3,10 +3,13 @@ require "json"
 class Dsh < Formula
   desc "Agent-harness CLI (no-telemetry fork)"
   homepage "https://github.com/nentor/deepseek-harness-no-telemetry"
-  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/dsh-v0.2.2-rc.3.tar.gz"
-  version "0.2.2-rc.3-no-telemetry"
-  sha256 "39191a9f5d16b2ac960e97df259804c98dc3b2e7c0617d0402bb2d65caeac2b8"
+  url "https://github.com/nentor/deepseek-harness-no-telemetry/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
+  version "0.2.2-rc.5-no-telemetry"
+  sha256 "3d15a392f81e7c1d8266aff3b36ed31d0988178b34e7e9d2a06b684eb868e135"
   license "MIT"
+  bottle do
+    root_url "https://github.com/nentor/deepseek-harness-no-telemetry/releases/download/dsh-v0.2.2-rc.5"
+  end
   depends_on "cmake" => :build
   depends_on "pnpm" => :build
   depends_on "node@24"
@@ -15,7 +18,7 @@ class Dsh < Formula
 
   def install
     # Tag tarballs carry no .git metadata; the build accepts the commit explicitly.
-    ENV["DSH_CLIENT_COMMIT_HASH"] = "5f1f4b9"
+    ENV["DSH_CLIENT_COMMIT_HASH"] = "1c88457"
     system "pnpm", "install", "--frozen-lockfile"
     system "pnpm", "run", "build:official"
     # Pack the workspace and install from local tarballs exactly like CI
@@ -95,6 +98,6 @@ class Dsh < Formula
   end
 
   test do
-    assert_match "0.2.2-rc.3", shell_output("#{bin}/dsh --version")
+    assert_match "0.2.2-rc.5", shell_output("#{bin}/dsh --version")
   end
 end
